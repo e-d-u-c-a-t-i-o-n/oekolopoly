@@ -5,6 +5,7 @@
   const app = document.getElementById("app");
 
   const MAX_ROUNDS = 12;
+  const SAVE_ACTION_POINTS_FROM_ROUND = 3;
   const DEFAULT_LANGUAGE = "de";
   const languageOptions = {
     de: { code: "DE", label: "Deutsch", htmlLang: "de" },
@@ -107,17 +108,23 @@
       result: {
         kicker: (years) => `Abrechnung nach ${years} Jahren`,
         newTerm: "Neue Amtszeit",
+        scenario: "Gespieltes Land",
+        actionPointScore: "Aktionspunkte",
+        actionPointScoreValue: (points) => `${points} AP`,
+        nextChallenge: (scenario) => `Geschafft! Probiere als Nächstes das ${scenario}.`,
         plotsAria: "Verlaufsplots"
       },
       messages: {
         distributeAll: "Verteile alle Aktionspunkte und starte dann die Runde.",
         allAllocated: "Alle Aktionspunkte sind vergeben. Die Runde kann starten.",
+        savingActionPoints: (points) => `${points} offene Aktionspunkte werden in die nächste Runde mitgenommen. Die Runde kann starten.`,
         controlView: "Im Stellwerk kannst du Aktionspunkte vergeben.",
         effectsView: "Hier siehst du die Wirkungsketten deiner Entscheidungen.",
-        allocateBeforeStart: "Bitte vergib alle Aktionspunkte, bevor du die Runde startest.",
+        allocateBeforeStart: "Bitte vergib in den ersten zwei Jahren alle Aktionspunkte, bevor du die Runde startest.",
         effectsRunning: "Die Wirkungskette läuft. Der Umschalter ist bis zum Ende gesperrt.",
-        allocateBeforeFastForward: "Bitte vergib alle Aktionspunkte, bevor du die Runde sofort berechnest.",
+        allocateBeforeFastForward: "Bitte vergib in den ersten zwei Jahren alle Aktionspunkte, bevor du die Runde sofort berechnest.",
         yearActionPoints: (round, points) => `Jahr ${round}: Dir stehen ${points} Aktionspunkte zur Verfügung.`,
+        savedActionPoints: (points, total) => `${points} ungenutzte AP wurden mitgenommen. Neue Runde: ${total} Aktionspunkte.`,
         paused: "Simulation pausiert.",
         runningAgain: "Die Wirkungskette läuft weiter.",
         initialActionPoints: (points) => `Du hast am Anfang ${points} Aktionspunkte. Verteile sie im Stellwerk.`,
@@ -174,7 +181,7 @@
           {
             kicker: "Deine Entscheidung",
             title: "Jetzt bist du dran",
-            text: "Verteile den Rest der Aktionspunkte selbst und starte dann die Runde, sobald keine Punkte mehr offen sind."
+            text: "Verteile den Rest der Aktionspunkte selbst und starte dann die Runde. Ab Jahr 3 kannst du übrig gebliebene Punkte in die nächste Runde mitnehmen."
           }
         ]
       },
@@ -336,14 +343,14 @@
   };
 
   const metrics = [
-    { key: "politik", label: "Politik", max: 32, color: "red", x: 3, y: 7, w: 20, h: 27, art: "parliament", image: "assets/images/metric-politik.png" },
-    { key: "sanierung", label: "Sanierung", max: 32, color: "red", x: 28, y: 7, w: 20, h: 27, art: "fields", image: "assets/images/metric-sanierung.png", control: true },
-    { key: "produktion", label: "Produktion", max: 32, color: "green", x: 53, y: 7, w: 20, h: 27, art: "factory", image: "assets/images/metric-produktion.png", control: true },
-    { key: "umweltbelastung", label: "Umweltbelastung", max: 32, color: "orange", x: 78, y: 7, w: 20, h: 27, art: "dump", image: "assets/images/metric-umweltbelastung.png" },
-    { key: "bevoelkerung", label: "Bevölkerung", max: 48, color: "green", x: 3, y: 57, w: 22, h: 27, art: "city", image: "assets/images/metric-bevoelkerung.png" },
-    { key: "vermehrungsrate", label: "Vermehrungsrate", max: 32, color: "orange", x: 27, y: 57, w: 21, h: 27, art: "home", image: "assets/images/metric-vermehrungsrate.png" },
-    { key: "lebensqualitaet", label: "Lebensqualität", max: 32, color: "red", x: 51, y: 57, w: 22, h: 27, art: "park", image: "assets/images/metric-lebensqualitaet.png", control: true },
-    { key: "aufklaerung", label: "Bildung", max: 32, color: "orange", x: 76, y: 57, w: 22, h: 27, art: "school", image: "assets/images/metric-aufklaerung.png", control: true }
+    { key: "politik", label: "Politik", max: 32, color: "red", x: 3, y: 7, w: 20, h: 27, art: "parliament", image: "assets/images/metric-politik.jpg" },
+    { key: "sanierung", label: "Sanierung", max: 32, color: "red", x: 28, y: 7, w: 20, h: 27, art: "fields", image: "assets/images/metric-sanierung.jpg", control: true },
+    { key: "produktion", label: "Produktion", max: 32, color: "green", x: 53, y: 7, w: 20, h: 27, art: "factory", image: "assets/images/metric-produktion.jpg", control: true },
+    { key: "umweltbelastung", label: "Umweltbelastung", max: 32, color: "orange", x: 78, y: 7, w: 20, h: 27, art: "dump", image: "assets/images/metric-umweltbelastung.jpg" },
+    { key: "bevoelkerung", label: "Bevölkerung", max: 48, color: "green", x: 3, y: 57, w: 22, h: 27, art: "city", image: "assets/images/metric-bevoelkerung.jpg" },
+    { key: "vermehrungsrate", label: "Vermehrungsrate", max: 32, color: "orange", x: 27, y: 57, w: 21, h: 27, art: "home", image: "assets/images/metric-vermehrungsrate.jpg" },
+    { key: "lebensqualitaet", label: "Lebensqualität", max: 32, color: "red", x: 51, y: 57, w: 22, h: 27, art: "park", image: "assets/images/metric-lebensqualitaet.jpg", control: true },
+    { key: "aufklaerung", label: "Bildung", max: 32, color: "orange", x: 76, y: 57, w: 22, h: 27, art: "school", image: "assets/images/metric-aufklaerung.jpg", control: true }
   ];
 
   const metricTooltips = {
@@ -568,6 +575,28 @@
     return state.actionPoints - usedActionPoints(state.allocations);
   }
 
+  function canSaveActionPoints() {
+    return state.round >= SAVE_ACTION_POINTS_FROM_ROUND;
+  }
+
+  function canStartRound() {
+    return remainingActionPoints() === 0 || canSaveActionPoints();
+  }
+
+  function translatedMessage(key, ...args) {
+    const messages = text().messages || {};
+    const fallbackMessages = translations.de.messages;
+    const message = messages[key] || fallbackMessages[key];
+    return typeof message === "function" ? message(...args) : message;
+  }
+
+  function allocationReadyMessage() {
+    const left = remainingActionPoints();
+    if (left === 0) return translatedMessage("allAllocated");
+    if (canSaveActionPoints()) return translatedMessage("savingActionPoints", left);
+    return translatedMessage("distributeAll");
+  }
+
   function escapeHtml(value) {
     return String(value)
       .replace(/&/g, "&amp;")
@@ -723,6 +752,12 @@
   function scenarioLabel(key) {
     const scenario = text().scenarios[key];
     return scenario ? scenario.label : scenarios[key].label;
+  }
+
+  function nextScenarioKey(key) {
+    const order = ["industrieland", "schwellenland", "entwicklungsland"];
+    const index = order.indexOf(key);
+    return index >= 0 ? order[index + 1] || "" : "";
   }
 
   function scenarioDescription(key) {
@@ -1030,8 +1065,9 @@
     const viewIcon = state.view === "control" ? "⇄" : "▦";
     const disabled = state.running ? "disabled" : "";
     const left = remainingActionPoints();
-    const startDisabled = state.running || left !== 0 ? "disabled" : "";
-    const fastForwardDisabled = state.running || left === 0 ? "" : "disabled";
+    const canStart = canStartRound();
+    const startDisabled = state.running || !canStart ? "disabled" : "";
+    const fastForwardDisabled = state.running || canStart ? "" : "disabled";
 
     return `
       <header class="topline">
@@ -1255,7 +1291,7 @@
   function renderBottomBar() {
     const copy = text();
     const left = remainingActionPoints();
-    const startDisabled = state.running || left !== 0 ? "disabled" : "";
+    const startDisabled = state.running || !canStartRound() ? "disabled" : "";
     const pauseDisabled = state.running ? "" : "disabled";
     const bottomToggleLabel = state.view === "control" ? copy.views.state : copy.views.control;
     const activeText = state.activeStep
@@ -1354,9 +1390,7 @@
       state.view = "control";
     }
     state.activeTipKey = "";
-    state.message = remainingActionPoints() === 0
-      ? text().messages.allAllocated
-      : text().messages.distributeAll;
+    state.message = allocationReadyMessage();
     render();
   }
 
@@ -1382,38 +1416,48 @@
     if (usedActionPoints(nextAllocations) > state.actionPoints) return;
 
     state.allocations = nextAllocations;
-    state.message = remainingActionPoints() === 0
-      ? text().messages.allAllocated
-      : text().messages.distributeAll;
+    state.message = allocationReadyMessage();
     advanceCoach();
   }
 
   function renderResult() {
     const copy = text();
+    const resultCopy = Object.assign({}, translations.de.result, copy.result);
     const evaluation = evaluateGame();
     const resultTone = evaluation.tone || "success";
     const resultOutcome = resultTone === "fail" || resultTone === "weak" ? "fail" : "success";
+    const followUpScenarioKey = resultOutcome === "success" ? nextScenarioKey(state.scenarioKey) : "";
+    const followUpText = followUpScenarioKey
+      ? resultCopy.nextChallenge(scenarioLabel(followUpScenarioKey))
+      : "";
     app.innerHTML = `
       <section class="result-screen" data-scenario="${state.scenarioKey}" data-outcome="${resultOutcome}" data-result-tone="${resultTone}">
         <div class="result-panel" data-result-tone="${resultTone}">
           <div class="result-summary-panel">
             <div class="result-panel-top">
-              <p class="kicker">${copy.result.kicker(state.history.length)}</p>
-              <button class="result-restart-top" data-action="restart">${copy.result.newTerm}</button>
+              <p class="kicker">${resultCopy.kicker(state.history.length)}</p>
+              <button class="result-restart-top" data-action="restart">${resultCopy.newTerm}</button>
             </div>
             <h1>${evaluation.title}</h1>
             <p>${evaluation.text}</p>
+            ${followUpText ? `<p class="result-next-challenge">${escapeHtml(followUpText)}</p>` : ""}
             <dl class="result-grid">
-              ${metrics.map((metric) => `
-                <div>
-                  <dt>${metricLabel(metric.key)}</dt>
-                  <dd>${Math.round(state.values[metric.key])}</dd>
-                </div>
-              `).join("")}
+              <div class="result-meta-card">
+                <dt>${resultCopy.scenario}</dt>
+                <dd class="result-text-value">${escapeHtml(scenarioLabel(state.scenarioKey))}</dd>
+              </div>
+              <div class="result-meta-card result-action-points-card">
+                <dt>${resultCopy.actionPointScore}</dt>
+                <dd>${escapeHtml(resultCopy.actionPointScoreValue(state.actionPoints))}</dd>
+              </div>
+              <div>
+                <dt>${metricLabel("politik")}</dt>
+                <dd>${Math.round(state.values.politik)}</dd>
+              </div>
             </dl>
           </div>
           <div class="result-diagram-panel">
-            <div class="result-plots" aria-label="${copy.result.plotsAria}">
+            <div class="result-plots" aria-label="${resultCopy.plotsAria}">
               ${metrics.map((metric) => `
                 <article class="result-plot-card">
                   <h2>${metricLabel(metric.key)}</h2>
@@ -1423,7 +1467,7 @@
                 </article>
               `).join("")}
             </div>
-            <button data-action="restart">${copy.result.newTerm}</button>
+            <button data-action="restart">${resultCopy.newTerm}</button>
           </div>
         </div>
       </section>
@@ -1451,9 +1495,7 @@
 
     state.allocations = nextAllocations;
     state.activeTipKey = "";
-    state.message = remainingActionPoints() === 0
-      ? text().messages.allAllocated
-      : text().messages.distributeAll;
+    state.message = allocationReadyMessage();
     render();
   }
 
@@ -1490,8 +1532,8 @@
   function startSimulation() {
     if (state.running) return;
 
-    if (remainingActionPoints() !== 0) {
-      state.message = text().messages.allocateBeforeStart;
+    if (!canStartRound()) {
+      state.message = translatedMessage("allocateBeforeStart");
       render();
       return;
     }
@@ -1510,8 +1552,8 @@
 
   function fastForwardSimulation() {
     if (!state.running) {
-      if (remainingActionPoints() !== 0) {
-        state.message = text().messages.allocateBeforeFastForward;
+      if (!canStartRound()) {
+        state.message = translatedMessage("allocateBeforeFastForward");
         render();
         return;
       }
@@ -1610,15 +1652,17 @@
   function finishRound() {
     clearTimeout(timer);
     const sim = state.simulation;
+    const carriedActionPoints = canSaveActionPoints() ? Math.max(0, remainingActionPoints()) : 0;
 
     state.values = Object.assign({}, sim.finalValues);
-    state.actionPoints = sim.nextActionPoints;
+    state.actionPoints = sim.nextActionPoints + carriedActionPoints;
     state.history.push({
       round: state.round,
       beforeValues: Object.assign({}, sim.startValues),
       allocationValues: Object.assign({}, sim.allocationValues),
       allocations: Object.assign({}, state.allocations),
       values: Object.assign({}, state.values),
+      carriedActionPoints,
       actionPointDetails: sim.actionPointDetails
     });
 
@@ -1646,7 +1690,10 @@
     state.round += 1;
     state.view = "control";
     state.activeTipKey = "";
-    state.message = text().messages.yearActionPoints(state.round, state.actionPoints);
+    state.message = translatedMessage("yearActionPoints", state.round, state.actionPoints);
+    if (carriedActionPoints > 0) {
+      state.message += ` ${translatedMessage("savedActionPoints", carriedActionPoints, state.actionPoints)}`;
+    }
     render();
   }
 
