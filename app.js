@@ -63,7 +63,7 @@
         chooseScenario: "Ausgangslage wählen",
         teaserAria: "Kurze Einführung in den Regierungsauftrag",
         teaserBubbles: [
-          "Du regierst 12 Jahre.",
+          "Du regierst maximal 12 Jahre.",
           "Politik ist wichtig, wirkt aber indirekt.",
           "Sanierung und Bildung stabilisieren dein Land."
         ]
@@ -1440,7 +1440,7 @@
             </div>
             <h1>${evaluation.title}</h1>
             <p>${evaluation.text}</p>
-            ${followUpText ? `<p class="result-next-challenge">${escapeHtml(followUpText)}</p>` : ""}
+            ${followUpText ? `<button class="result-next-challenge" data-action="select-next-scenario" data-scenario="${followUpScenarioKey}">${escapeHtml(followUpText)}</button>` : ""}
             <dl class="result-grid">
               <div class="result-meta-card">
                 <dt>${resultCopy.scenario}</dt>
@@ -1770,6 +1770,12 @@
     render();
   }
 
+  function selectScenarioAndRestart(scenarioKey) {
+    if (!scenarios[scenarioKey]) return;
+    state.scenarioKey = scenarioKey;
+    restart();
+  }
+
   app.addEventListener("submit", (event) => {
     const form = event.target.closest("[data-action='start-game']");
     if (!form) return;
@@ -1811,6 +1817,8 @@
       fastForwardSimulation();
     } else if (action === "restart") {
       restart();
+    } else if (action === "select-next-scenario") {
+      selectScenarioAndRestart(target.dataset.scenario);
     } else if (action === "toggle-plot") {
       toggleMetricArtwork(target.dataset.key);
     } else if (action === "coach-apply") {
