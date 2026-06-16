@@ -130,6 +130,8 @@
         next: "Weiter",
         done: "Selbst weiterspielen",
         applySuggestion: "Vorschlag übernehmen",
+        showEffects: "Wirkung ansehen",
+        showControl: "Zurück zum Stellwerk",
         steps: [
           {
             kicker: "Erste Amtszeit",
@@ -155,9 +157,24 @@
             suggestion: "Vorschlag: 1 Aktionspunkt in Lebensqualität."
           },
           {
+            kicker: "Wirkung",
+            title: "Öffne die Wirkungsansicht",
+            text: "Dort siehst du, welchen Einfluss die einzelnen Bereiche aufeinander haben."
+          },
+          {
+            kicker: "Wirkung",
+            title: "So hängen die Bereiche zusammen",
+            text: "Die Linien zeigen, welche Bereiche einander beeinflussen. Während einer Runde läuft diese Kette Schritt für Schritt durch."
+          },
+          {
+            kicker: "Zurück im Stellwerk",
+            title: "Tipps direkt an den Icons",
+            text: "Du kannst immer über die Icons hovern, um weitere Tipps zu bekommen: zum Beispiel, ab welcher Stufe es besser oder schlechter wird."
+          },
+          {
             kicker: "Deine Entscheidung",
-            title: "Den Rest verteilst du selbst",
-            text: "Die Hälfte der ersten Aktionspunkte ist erklärt. Nutze die übrigen Punkte frei und starte dann die Runde, sobald keine Aktionspunkte mehr offen sind."
+            title: "Jetzt bist du dran",
+            text: "Verteile den Rest der Aktionspunkte selbst und starte dann die Runde, sobald keine Punkte mehr offen sind."
           }
         ]
       },
@@ -443,6 +460,9 @@
     { focus: "sanierung", allocation: { sanierung: 2 } },
     { focus: "aufklaerung", allocation: { aufklaerung: 2 } },
     { focus: "lebensqualitaet", allocation: { lebensqualitaet: 1 } },
+    { focus: "effects", view: "effects" },
+    { focus: "effects", view: "control" },
+    { focus: "control-tips" },
     { focus: "action-points" }
   ];
 
@@ -1089,11 +1109,19 @@
     const hasOpenSuggestion = meta.allocation && !isCoachSuggestionDone(meta);
     const primaryAction = hasOpenSuggestion
       ? "coach-apply"
+      : meta.view === "effects"
+        ? "coach-show-effects"
+        : meta.view === "control"
+          ? "coach-show-control"
       : lastStep
         ? "coach-finish"
         : "coach-next";
     const primaryLabel = hasOpenSuggestion
       ? copy.applySuggestion
+      : meta.view === "effects"
+        ? copy.showEffects
+        : meta.view === "control"
+          ? copy.showControl
       : lastStep
         ? copy.done
         : copy.next;
@@ -1126,8 +1154,16 @@
     render();
   }
 
+  function showCoachView(view) {
+    state.view = view === "effects" ? "effects" : "control";
+    advanceCoach();
+  }
+
   function finishCoach() {
     state.coach.active = false;
+    if (state.screen === "game" && state.round === 1 && !state.running) {
+      state.view = "control";
+    }
     state.message = remainingActionPoints() === 0
       ? text().messages.allAllocated
       : text().messages.distributeAll;
@@ -1524,6 +1560,10 @@
       applyCoachSuggestion();
     } else if (action === "coach-next") {
       advanceCoach();
+    } else if (action === "coach-show-effects") {
+      showCoachView("effects");
+    } else if (action === "coach-show-control") {
+      showCoachView("control");
     } else if (action === "coach-finish") {
       finishCoach();
     }

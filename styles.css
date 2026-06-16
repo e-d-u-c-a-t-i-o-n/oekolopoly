@@ -669,15 +669,23 @@ button:disabled {
 .game-screen.has-coach[data-coach-focus="sanierung"] .station[data-tour-key="sanierung"],
 .game-screen.has-coach[data-coach-focus="aufklaerung"] .station[data-tour-key="aufklaerung"],
 .game-screen.has-coach[data-coach-focus="lebensqualitaet"] .station[data-tour-key="lebensqualitaet"],
+.game-screen.has-coach[data-coach-focus="effects"] .top-actions button[data-action="toggle-view"],
 .game-screen.has-coach[data-coach-focus="action-points"] .top-ap-compact {
   z-index: 25;
   opacity: 1;
   filter: none;
 }
 
+.game-screen.has-coach[data-coach-focus="effects"] .effects-board,
+.game-screen.has-coach[data-coach-focus="control-tips"] .station-art {
+  z-index: 25;
+  box-shadow: 0 0 0 4px rgba(255, 179, 62, 0.34), 0 18px 34px rgba(6, 34, 52, 0.18);
+}
+
 .game-screen.has-coach[data-coach-focus="sanierung"] .station[data-tour-key="sanierung"] .station-art,
 .game-screen.has-coach[data-coach-focus="aufklaerung"] .station[data-tour-key="aufklaerung"] .station-art,
 .game-screen.has-coach[data-coach-focus="lebensqualitaet"] .station[data-tour-key="lebensqualitaet"] .station-art,
+.game-screen.has-coach[data-coach-focus="effects"] .top-actions button[data-action="toggle-view"],
 .game-screen.has-coach[data-coach-focus="action-points"] .top-ap-compact {
   box-shadow: 0 0 0 4px rgba(255, 179, 62, 0.42), 0 18px 34px rgba(6, 34, 52, 0.2);
 }
