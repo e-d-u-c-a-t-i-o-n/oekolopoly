@@ -995,6 +995,33 @@
         ${coachVisible ? renderCoachOverlay() : ""}
       </section>
     `;
+
+    if (coachVisible) scheduleCoachFocusScroll(coachFocus);
+  }
+
+  function scheduleCoachFocusScroll(focus) {
+    const focusTargets = {
+      sanierung: '.station[data-tour-key="sanierung"]',
+      aufklaerung: '.station[data-tour-key="aufklaerung"]',
+      lebensqualitaet: '.station[data-tour-key="lebensqualitaet"]',
+      effects: '.top-actions button[data-action="toggle-view"]',
+      "control-tips": '.station[data-tour-key="politik"]',
+      "action-points": ".top-ap-compact"
+    };
+    const selector = focusTargets[focus];
+    if (!selector) return;
+
+    window.requestAnimationFrame(() => {
+      const target = app.querySelector(selector);
+      if (!target) return;
+      if (focus === "effects") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      const block = focus === "effects" || focus === "action-points" ? "start" : "center";
+      target.scrollIntoView({ block, inline: "nearest", behavior: "smooth" });
+    });
   }
 
   function renderHeader() {

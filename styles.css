@@ -719,6 +719,12 @@ button:disabled {
   backdrop-filter: blur(18px);
 }
 
+.game-screen.has-coach[data-coach-focus="aufklaerung"] .coach-panel,
+.game-screen.has-coach[data-coach-focus="lebensqualitaet"] .coach-panel {
+  right: auto;
+  left: clamp(16px, 3vw, 36px);
+}
+
 .coach-panel .kicker {
   margin: 0;
 }
@@ -865,6 +871,8 @@ button:disabled {
   --station-accent: var(--ink);
 }
 
+.station:hover,
+.station:focus-within,
 .station.is-tooltip-visible {
   z-index: 80;
 }
@@ -915,6 +923,7 @@ button:disabled {
     opacity 160ms ease,
     transform 160ms ease,
     visibility 160ms ease;
+  transition-delay: 0s;
   visibility: hidden;
 }
 
@@ -954,12 +963,33 @@ button:disabled {
   border-left: 1px solid rgba(6, 34, 52, 0.18);
 }
 
-.station:hover .station-tooltip,
-.station:focus-within .station-tooltip,
+.station[data-tour-key="politik"] .station-tooltip,
+.station[data-tour-key="bevoelkerung"] .station-tooltip {
+  right: auto;
+  left: 42px;
+}
+
+.station[data-tour-key="politik"] .station-tooltip::after,
+.station[data-tour-key="bevoelkerung"] .station-tooltip::after {
+  right: auto;
+  left: 48px;
+}
+
+.station-art-button:hover + .station-tooltip,
+.station-art-button:focus-visible + .station-tooltip,
 .station.is-tooltip-visible .station-tooltip {
   opacity: 1;
   transform: translateY(0) scale(1);
   visibility: visible;
+}
+
+.station-art-button:hover + .station-tooltip,
+.station-art-button:focus-visible + .station-tooltip {
+  transition-delay: 560ms;
+}
+
+.station.is-tooltip-visible .station-tooltip {
+  transition-delay: 0s;
 }
 
 .meter,
@@ -1804,6 +1834,13 @@ button:disabled {
     left: 12px;
     width: auto;
     padding: 14px;
+  }
+
+  .game-screen.has-coach[data-coach-focus="aufklaerung"] .coach-panel,
+  .game-screen.has-coach[data-coach-focus="lebensqualitaet"] .coach-panel {
+    right: auto;
+    left: 12px;
+    width: min(360px, calc(100vw - 24px));
   }
 
   .coach-panel h2 {
