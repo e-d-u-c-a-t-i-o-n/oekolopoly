@@ -31,15 +31,15 @@
       scenarios: {
         industrieland: {
           label: "Industrieland",
-          description: "Hohe Produktion, bessere Bildung, spürbare Umweltbelastung."
+          description: "Einsteigerfreundlich: starke Industrie, mehr Politik, niedrigeres Wachstum."
         },
         schwellenland: {
           label: "Schwellenland",
-          description: "Die Ausgangslage ist angespannt, aber noch gestaltbar."
+          description: "Fortgeschritten: Industrie ist da, aber Politik und Wachstum setzen dich unter Druck."
         },
         entwicklungsland: {
           label: "Entwicklungsland",
-          description: "Wenig Produktion, niedrige Lebensqualität, hohes Bevölkerungswachstum."
+          description: "Schwer: Umwelt und Bevölkerung wachsen schneller als dein Handlungsspielraum."
         }
       },
       scenarioPreview: {
@@ -55,11 +55,17 @@
       },
       intro: {
         kicker: "Regierungsauftrag",
-        description: "Du übernimmst ein erschöpftes Land: Industrie läuft, Flüsse kippen, die Bevölkerung wächst und das Vertrauen in die Politik ist niedrig. Du hast 12 Jahre Zeit, die Lage zu stabilisieren.",
+        description: "Du bist Regierungschef. Deine Macht hängt von der Unterstützung der Bevölkerung ab. Verteile Aktionspunkte so, dass es den Menschen im Land langfristig gut geht.",
         leaderName: "Name des Regierungschefs",
         namePlaceholder: "Dein Name",
         startTerm: "Amtszeit beginnen",
-        chooseScenario: "Ausgangslage wählen"
+        chooseScenario: "Ausgangslage wählen",
+        teaserAria: "Kurze Einführung in den Regierungsauftrag",
+        teaserBubbles: [
+          "Du regierst 12 Jahre.",
+          "Politik ist wichtig, wirkt aber indirekt.",
+          "Sanierung und Bildung stabilisieren dein Land."
+        ]
       },
       defaults: {
         leaderName: "Regierungschef",
@@ -118,6 +124,42 @@
         debugFlow: "Debugansicht: aktive Wirkung Lebensqualität.",
         debugEffects: "Debugansicht: Wirkungsketten ohne laufende Simulation.",
         debugControl: "Debugansicht: Stellwerk bereit."
+      },
+      coach: {
+        skip: "Überspringen",
+        next: "Weiter",
+        done: "Selbst weiterspielen",
+        applySuggestion: "Vorschlag übernehmen",
+        steps: [
+          {
+            kicker: "Erste Amtszeit",
+            title: "Du bist Regierungschef",
+            text: "Deine Macht hängt an der Politik. Direkt erhöhen kannst du sie nicht: Die Bevölkerung unterstützt dich, wenn Lebensqualität, Umwelt und Entwicklung glaubwürdig zusammenpassen."
+          },
+          {
+            kicker: "Vorschlag 1",
+            title: "Starte mit Sanierung",
+            text: "Sanierung senkt Umweltbelastung. Gerade ein Industrieland wird dadurch schnell stabiler.",
+            suggestion: "Vorschlag: 2 Aktionspunkte in Sanierung."
+          },
+          {
+            kicker: "Vorschlag 2",
+            title: "Investiere in Bildung",
+            text: "Bildung wirkt langsam, aber stark: Sie verbessert Lebensqualität und kann das Bevölkerungswachstum entspannen.",
+            suggestion: "Vorschlag: 2 Aktionspunkte in Bildung."
+          },
+          {
+            kicker: "Vorschlag 3",
+            title: "Stütze die Lebensqualität",
+            text: "Lebensqualität hilft der Politik. Wenn Menschen merken, dass der Kurs wirkt, bleibt deine Regierung handlungsfähig.",
+            suggestion: "Vorschlag: 1 Aktionspunkt in Lebensqualität."
+          },
+          {
+            kicker: "Deine Entscheidung",
+            title: "Den Rest verteilst du selbst",
+            text: "Die Hälfte der ersten Aktionspunkte ist erklärt. Nutze die übrigen Punkte frei und starte dann die Runde, sobald keine Aktionspunkte mehr offen sind."
+          }
+        ]
       },
       simulation: {
         controlTitle: "Stellwerk",
@@ -297,7 +339,22 @@
   const scenarios = {
     industrieland: {
       label: "Industrieland",
-      description: "Hohe Produktion, bessere Bildung, spürbare Umweltbelastung.",
+      description: "Einsteigerfreundlich: starke Industrie, mehr Politik, niedrigeres Wachstum.",
+      actionPoints: 10,
+      values: {
+        politik: 13,
+        sanierung: 5,
+        produktion: 14,
+        umweltbelastung: 15,
+        bevoelkerung: 22,
+        vermehrungsrate: 12,
+        lebensqualitaet: 11,
+        aufklaerung: 8
+      }
+    },
+    schwellenland: {
+      label: "Schwellenland",
+      description: "Fortgeschritten: Industrie ist da, aber Politik und Wachstum setzen dich unter Druck.",
       actionPoints: 8,
       values: {
         politik: 2,
@@ -310,9 +367,9 @@
         aufklaerung: 4
       }
     },
-    schwellenland: {
-      label: "Schwellenland",
-      description: "Die Ausgangslage ist angespannt, aber noch gestaltbar.",
+    entwicklungsland: {
+      label: "Entwicklungsland",
+      description: "Schwer: Umwelt und Bevölkerung wachsen schneller als dein Handlungsspielraum.",
       actionPoints: 8,
       values: {
         politik: 2,
@@ -322,21 +379,6 @@
         bevoelkerung: 23,
         vermehrungsrate: 20,
         lebensqualitaet: 9,
-        aufklaerung: 2
-      }
-    },
-    entwicklungsland: {
-      label: "Entwicklungsland",
-      description: "Wenig Produktion, niedrige Lebensqualität, hohes Bevölkerungswachstum.",
-      actionPoints: 10,
-      values: {
-        politik: 2,
-        sanierung: 2,
-        produktion: 3,
-        umweltbelastung: 14,
-        bevoelkerung: 22,
-        vermehrungsrate: 24,
-        lebensqualitaet: 3,
         aufklaerung: 2
       }
     }
@@ -385,12 +427,24 @@
     message: i18n(initialLanguageValue).messages.distributeAll,
     activeStep: null,
     simulation: null,
+    coach: {
+      active: false,
+      step: 0
+    },
     showPlots: false,
     allocations: blankAllocations(),
     history: [],
     initialValues: initialValues("industrieland"),
     values: initialValues("industrieland")
   };
+
+  const coachFlow = [
+    { focus: "overview" },
+    { focus: "sanierung", allocation: { sanierung: 2 } },
+    { focus: "aufklaerung", allocation: { aufklaerung: 2 } },
+    { focus: "lebensqualitaet", allocation: { lebensqualitaet: 1 } },
+    { focus: "action-points" }
+  ];
 
   let timer = null;
   applyLanguage();
@@ -504,6 +558,30 @@
   function scenarioDescription(key) {
     const scenario = text().scenarios[key];
     return scenario ? scenario.description : scenarios[key].description;
+  }
+
+  function coachCopy() {
+    return text().coach || translations.de.coach;
+  }
+
+  function isCoachVisible() {
+    return state.coach.active && state.screen === "game" && state.round === 1 && !state.running;
+  }
+
+  function currentCoachIndex() {
+    const steps = coachCopy().steps;
+    return clamp(state.coach.step, 0, steps.length - 1);
+  }
+
+  function currentCoachMeta() {
+    return coachFlow[currentCoachIndex()] || coachFlow[0];
+  }
+
+  function isCoachSuggestionDone(meta) {
+    if (!meta || !meta.allocation) return false;
+    return Object.keys(meta.allocation).every((key) => {
+      return (state.allocations[key] || 0) >= meta.allocation[key];
+    });
   }
 
   function metricMinValue(key) {
@@ -659,6 +737,7 @@
           <p class="kicker">${copy.kicker}</p>
           <h1>Ökolopoly</h1>
           <p>${copy.description}</p>
+          ${renderIntroTeaser(copy)}
           <form class="name-form" data-action="start-game">
             <label for="leader-name">${copy.leaderName}</label>
             <div class="name-row">
@@ -685,6 +764,18 @@
           <a href="impressum.html">Impressum</a>
         </p>
       </section>
+    `;
+  }
+
+  function renderIntroTeaser(copy) {
+    const bubbles = copy.teaserBubbles || translations.de.intro.teaserBubbles;
+
+    return `
+      <div class="intro-teaser" aria-label="${copy.teaserAria || translations.de.intro.teaserAria}">
+        ${bubbles.map((bubble, index) => `
+          <span style="--bubble-index:${index}">${escapeHtml(bubble)}</span>
+        `).join("")}
+      </div>
     `;
   }
 
@@ -722,12 +813,16 @@
   }
 
   function renderGame() {
+    const coachVisible = isCoachVisible();
+    const coachFocus = coachVisible ? currentCoachMeta().focus : "";
+
     app.innerHTML = `
-      <section class="game-screen">
+      <section class="game-screen ${coachVisible ? "has-coach" : ""}" data-coach-focus="${coachFocus}">
         ${renderHeader()}
         <div class="playfield ${state.view === "control" ? "is-control" : "is-effects"}">
           ${state.view === "control" ? renderControlBoard() : renderEffectsBoard()}
         </div>
+        ${coachVisible ? renderCoachOverlay() : ""}
       </section>
     `;
   }
@@ -857,14 +952,14 @@
     const controls = metric.control && !state.running
       ? `
         <div class="station-controls">
-          <button data-action="adjust" data-key="${metric.key}" data-delta="1" aria-label="${text().controls.increase(label)}">+</button>
-          <button data-action="adjust" data-key="${metric.key}" data-delta="-1" aria-label="${text().controls.decrease(label)}">&minus;</button>
+          <button data-action="adjust" data-key="${metric.key}" data-delta="1" data-tour-button="${metric.key}-plus" aria-label="${text().controls.increase(label)}">+</button>
+          <button data-action="adjust" data-key="${metric.key}" data-delta="-1" data-tour-button="${metric.key}-minus" aria-label="${text().controls.decrease(label)}">&minus;</button>
         </div>
       `
       : "";
 
     return `
-      <article class="station ${controlClass} station-${metric.art}" style="left:${metric.x}%; top:${metric.y}%; width:${metric.w}%; height:${metric.h}%;">
+      <article class="station ${controlClass} station-${metric.art}" data-tour-key="${metric.key}" style="left:${metric.x}%; top:${metric.y}%; width:${metric.w}%; height:${metric.h}%;">
         <div class="meter meter-${metric.color}" aria-label="${label}: ${Math.round(value)}">
           <div class="meter-fill" style="height:${percent}%"></div>
           <span class="meter-value">${Math.round(value)}</span>
@@ -985,11 +1080,93 @@
     `;
   }
 
+  function renderCoachOverlay() {
+    const copy = coachCopy();
+    const stepIndex = currentCoachIndex();
+    const step = copy.steps[stepIndex];
+    const meta = currentCoachMeta();
+    const lastStep = stepIndex >= copy.steps.length - 1;
+    const hasOpenSuggestion = meta.allocation && !isCoachSuggestionDone(meta);
+    const primaryAction = hasOpenSuggestion
+      ? "coach-apply"
+      : lastStep
+        ? "coach-finish"
+        : "coach-next";
+    const primaryLabel = hasOpenSuggestion
+      ? copy.applySuggestion
+      : lastStep
+        ? copy.done
+        : copy.next;
+
+    return `
+      <aside class="coach-panel" role="dialog" aria-live="polite" aria-label="${escapeHtml(step.title)}">
+        <div class="coach-progress">
+          <span>${stepIndex + 1}/${copy.steps.length}</span>
+        </div>
+        <p class="kicker">${escapeHtml(step.kicker)}</p>
+        <h2>${escapeHtml(step.title)}</h2>
+        <p>${escapeHtml(step.text)}</p>
+        ${step.suggestion ? `<p class="coach-suggestion">${escapeHtml(step.suggestion)}</p>` : ""}
+        <div class="coach-actions">
+          <button type="button" class="coach-secondary" data-action="coach-finish">${copy.skip}</button>
+          <button type="button" class="coach-primary" data-action="${primaryAction}">${primaryLabel}</button>
+        </div>
+      </aside>
+    `;
+  }
+
+  function advanceCoach() {
+    const lastStep = coachCopy().steps.length - 1;
+    if (currentCoachIndex() >= lastStep) {
+      finishCoach();
+      return;
+    }
+
+    state.coach.step = currentCoachIndex() + 1;
+    render();
+  }
+
+  function finishCoach() {
+    state.coach.active = false;
+    state.message = remainingActionPoints() === 0
+      ? text().messages.allAllocated
+      : text().messages.distributeAll;
+    render();
+  }
+
+  function applyCoachSuggestion() {
+    const meta = currentCoachMeta();
+    if (!meta.allocation) {
+      advanceCoach();
+      return;
+    }
+
+    const nextAllocations = Object.assign({}, state.allocations);
+
+    Object.keys(meta.allocation).forEach((key) => {
+      if (!controlKeys.includes(key)) return;
+      const target = meta.allocation[key];
+      const current = nextAllocations[key] || 0;
+      if (current >= target) return;
+      const projectedValue = state.values[key] + target;
+      if (projectedValue < metricMinValue(key) || projectedValue > metricByKey[key].max) return;
+      nextAllocations[key] = target;
+    });
+
+    if (usedActionPoints(nextAllocations) > state.actionPoints) return;
+
+    state.allocations = nextAllocations;
+    state.message = remainingActionPoints() === 0
+      ? text().messages.allAllocated
+      : text().messages.distributeAll;
+    advanceCoach();
+  }
+
   function renderResult() {
     const copy = text();
     const evaluation = evaluateGame();
-    const resultOutcome = state.resultReason === "dismissed" ? "fail" : "success";
-    const resultTone = evaluation.tone || resultOutcome;
+    const resultTone = evaluation.tone || "success";
+    const resultOutcome = resultTone === "fail" || resultTone === "weak" ? "fail" : "success";
     app.innerHTML = `
       <section class="result-screen" data-scenario="${state.scenarioKey}" data-outcome="${resultOutcome}" data-result-tone="${resultTone}">
         <div class="result-panel" data-result-tone="${resultTone}">
@@ -1055,6 +1232,13 @@
 
   function toggleView() {
     if (state.running) return;
+    if (state.coach.active && state.round === 1) {
+      state.view = "control";
+      state.message = text().messages.controlView;
+      render();
+      return;
+    }
+
     state.view = state.view === "control" ? "effects" : "control";
     state.message = state.view === "control"
       ? text().messages.controlView
@@ -1072,6 +1256,7 @@
     }
 
     state.view = "effects";
+    state.coach.active = false;
     state.running = true;
     state.paused = false;
     state.activeStep = null;
@@ -1091,6 +1276,7 @@
 
       state.running = true;
       state.paused = false;
+      state.coach.active = false;
       state.activeStep = null;
       state.simulation = buildSimulation();
     }
@@ -1281,6 +1467,8 @@
     state.message = text().messages.distributeAll;
     state.activeStep = null;
     state.simulation = null;
+    state.coach.active = false;
+    state.coach.step = 0;
     state.showPlots = false;
     state.allocations = blankAllocations();
     state.history = [];
@@ -1302,6 +1490,8 @@
     state.initialValues = initialValues(state.scenarioKey);
     state.values = Object.assign({}, state.initialValues);
     state.allocations = blankAllocations();
+    state.coach.active = true;
+    state.coach.step = 0;
     state.showPlots = false;
     state.screen = "game";
     state.view = "control";
@@ -1330,6 +1520,12 @@
     } else if (action === "toggle-plot") {
       state.showPlots = !state.showPlots;
       render();
+    } else if (action === "coach-apply") {
+      applyCoachSuggestion();
+    } else if (action === "coach-next") {
+      advanceCoach();
+    } else if (action === "coach-finish") {
+      finishCoach();
     }
   });
 
