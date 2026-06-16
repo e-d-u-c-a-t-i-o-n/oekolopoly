@@ -346,10 +346,34 @@
     { key: "aufklaerung", label: "Bildung", max: 32, color: "orange", x: 76, y: 57, w: 22, h: 27, art: "school", image: "assets/images/metric-aufklaerung.png", control: true }
   ];
 
+  const metricTooltips = {
+    politik: "Wenn Menschen Sicherheit, Arbeit und Hoffnung spüren, trauen sie der Regierung mehr zu. Wird der Alltag zu hart, kippt Vertrauen schnell in Unmut.",
+    sanierung: "Sanierung ist Vorsorge: reparieren, bevor Schäden riesig werden. Gute Kreisläufe und saubere Technik halten Umweltprobleme kleiner.",
+    produktion: "Ein stärkerer Wirtschaftsmotor hilft zuerst: mehr Arbeit, mehr Waren, mehr Geld. Wird er zu heiß gefahren, entstehen Probleme, die anderswo Punkte kosten.",
+    umweltbelastung: "Natur kann eine Weile viel abfedern. Ist der Puffer voll, trifft die Belastung plötzlich Gesundheit, Wohnen und Lebensqualität.",
+    bevoelkerung: "Viele Menschen können ein Land lebendig und stark machen. Wenn Platz, Arbeit und Versorgung nicht mithalten, wird aus Nähe schnell Gedränge.",
+    vermehrungsrate: "Viele Geburten können ein Land wachsen lassen, aber nur wenn Versorgung und Chancen mitwachsen. Bildung und bessere Lebensplanung verändern oft, wie groß Familien werden.",
+    lebensqualitaet: "Wenn Menschen gut leben können, bleiben sie eher und vertrauen der Politik mehr. Fällt die Lebensqualität zu tief, schrumpfen Hoffnung, Rückhalt und Bevölkerung.",
+    aufklaerung: "Wer mehr versteht, plant eher voraus: Gesundheit, Umwelt, Beruf und Familie. Das hebt oft die Lebensqualität, macht große Familien aber weniger selbstverständlich."
+  };
+
   const metricByKey = metrics.reduce((map, metric) => {
     map[metric.key] = metric;
     return map;
   }, {});
+
+  const effectDirections = {
+    politik: 1,
+    sanierung: 1,
+    produktion: 1,
+    umweltbelastung: -1,
+    bevoelkerung: 1,
+    vermehrungsrate: -1,
+    lebensqualitaet: 1,
+    aufklaerung: 1
+  };
+
+  const actionPointKeys = ["bevoelkerung", "politik", "produktion", "lebensqualitaet"];
 
   const controlKeys = ["sanierung", "produktion", "lebensqualitaet", "aufklaerung"];
 
@@ -449,6 +473,7 @@
       step: 0
     },
     showPlots: false,
+    activeTipKey: "",
     allocations: blankAllocations(),
     history: [],
     initialValues: initialValues("industrieland"),
@@ -564,6 +589,131 @@
   function metricLabel(key) {
     const labels = text().metrics;
     return labels[key] || (metricByKey[key] ? metricByKey[key].label : key);
+  }
+
+  function effectScoreForLevel(key, level, baseValues) {
+    const values = Object.assign({}, baseValues, { [key]: level });
+
+    return relations.reduce((score, relation) => {
+      const [from, to, curveKey] = relation;
+      if (from !== key) return score;
+
+      const direction = effectDirections[to] || 1;
+      const delta = curves[curveKey](level, { values });
+      return score + (direction * delta);
+    }, 0);
+  }
+
+  function nearestEffectChange(key) {
+    const outgoingRelations = relations.filter(([from]) => from === key);
+    if (!outgoingRelations.length) return { hasEffects: false };
+
+    const baseValues = valuesAfterAllocations(state.values, state.allocations);
+    const currentLevel = clampMetricValue(key, Math.round(baseValues[key]));
+    const metric = metricByKey[key];
+    const min = metricMinValue(key);
+    const max = metric.max;
+    const baseScore = effectScoreForLevel(key, currentLevel, baseValues);
+    let better = null;
+    let worse = null;
+
+    for (let distance = 1; currentLevel - distance >= min || currentLevel + distance <= max; distance += 1) {
+      const candidates = [currentLevel + distance, currentLevel - distance]
+        .filter((level) => level >= min && level <= max);
+
+      candidates.forEach((level) => {
+        const score = effectScoreForLevel(key, level, baseValues);
+        if (better === null && score > baseScore) better = level;
+        if (worse === null && score < baseScore) worse = level;
+      });
+
+      if (better !== null && worse !== null) break;
+    }
+
+    return {
+      hasEffects: true,
+      currentLevel,
+      better,
+      worse
+    };
+  }
+
+  function thresholdText(key, level, currentLevel, label) {
+    if (level === null) return `nicht ${label}`;
+    if (level < currentLevel) {
+      if (key === "politik" && label === "weniger") return "unter 0 abgesetzt!";
+      return `unter ${level + 1} ${label}`;
+    }
+
+    return `ab ${level} ${label}`;
+  }
+
+  function effectChangeText(key) {
+    const change = nearestEffectChange(key);
+    if (!change.hasEffects) return "Wirkung: keine direkte Wirkung";
+
+    const better = thresholdText(key, change.better, change.currentLevel, "besser");
+    const worse = thresholdText(key, change.worse, change.currentLevel, "schlechter");
+    return `Wirkung: ${better} / ${worse}`;
+  }
+
+  function actionPointTotalForLevel(key, level, baseValues) {
+    const values = Object.assign({}, baseValues, { [key]: level });
+    return calculateNextActionPoints(values).total;
+  }
+
+  function nearestActionPointChange(key) {
+    if (!actionPointKeys.includes(key)) return { hasActionPointEffect: false };
+
+    const baseValues = valuesAfterAllocations(state.values, state.allocations);
+    const currentLevel = clampMetricValue(key, Math.round(baseValues[key]));
+    const metric = metricByKey[key];
+    const min = metricMinValue(key);
+    const max = metric.max;
+    const baseTotal = actionPointTotalForLevel(key, currentLevel, baseValues);
+    let more = null;
+    let less = null;
+
+    for (let distance = 1; currentLevel - distance >= min || currentLevel + distance <= max; distance += 1) {
+      const candidates = [currentLevel + distance, currentLevel - distance]
+        .filter((level) => level >= min && level <= max);
+
+      candidates.forEach((level) => {
+        const total = actionPointTotalForLevel(key, level, baseValues);
+        if (more === null && total > baseTotal) more = level;
+        if (less === null && total < baseTotal) less = level;
+      });
+
+      if (more !== null && less !== null) break;
+    }
+
+    return {
+      hasActionPointEffect: true,
+      currentLevel,
+      more,
+      less
+    };
+  }
+
+  function actionPointChangeText(key) {
+    const change = nearestActionPointChange(key);
+    if (!change.hasActionPointEffect) return "Aktionspunkte: keine direkte Wirkung";
+
+    const more = thresholdText(key, change.more, change.currentLevel, "mehr");
+    const less = thresholdText(key, change.less, change.currentLevel, "weniger");
+    return `Aktionspunkte: ${more} / ${less}`;
+  }
+
+  function renderStationTooltip(key, tooltipText) {
+    return `
+      <p class="station-tooltip" id="station-tooltip-${key}" role="tooltip">
+        ${escapeHtml(tooltipText)}
+        <br>
+        <strong class="station-tooltip-analysis">${escapeHtml(effectChangeText(key))}</strong>
+        <br>
+        <strong class="station-tooltip-analysis">${escapeHtml(actionPointChangeText(key))}</strong>
+      </p>
+    `;
   }
 
   function consoleLabel(key) {
@@ -966,9 +1116,19 @@
     const planned = state.allocations[metric.key] || 0;
     const controlClass = metric.control ? "is-adjustable" : "";
     const isPlotVisible = state.showPlots;
+    const tooltipText = metricTooltips[metric.key] || "";
+    const tooltipId = `station-tooltip-${metric.key}`;
+    const showTutorialTip = isCoachVisible() && currentCoachMeta().focus === "control-tips" && metric.key === "politik";
+    const isTooltipVisible = !isPlotVisible && (state.activeTipKey === metric.key || showTutorialTip);
+    const tooltipClass = isTooltipVisible ? "is-tooltip-visible" : "";
+    const tooltipAttributes = tooltipText && !isPlotVisible
+      ? ` data-tooltip-trigger aria-describedby="${tooltipId}"`
+      : "";
     const artLabel = isPlotVisible
       ? text().plots.showImage(label)
-      : text().plots.showPlot(label);
+      : isTooltipVisible
+        ? text().plots.showPlot(label)
+        : `${label}: Tipp anzeigen`;
     const controls = metric.control && !state.running
       ? `
         <div class="station-controls">
@@ -979,14 +1139,15 @@
       : "";
 
     return `
-      <article class="station ${controlClass} station-${metric.art}" data-tour-key="${metric.key}" style="left:${metric.x}%; top:${metric.y}%; width:${metric.w}%; height:${metric.h}%;">
+      <article class="station ${controlClass} ${tooltipClass} station-${metric.art}" data-tour-key="${metric.key}" style="left:${metric.x}%; top:${metric.y}%; width:${metric.w}%; height:${metric.h}%;">
         <div class="meter meter-${metric.color}" aria-label="${label}: ${Math.round(value)}">
           <div class="meter-fill" style="height:${percent}%"></div>
           <span class="meter-value">${Math.round(value)}</span>
         </div>
-        <button class="station-art station-art-button ${isPlotVisible ? "is-plot-visible" : ""}" data-action="toggle-plot" data-key="${metric.key}" aria-label="${artLabel}">
+        <button class="station-art station-art-button ${isPlotVisible ? "is-plot-visible" : ""}" data-action="toggle-plot" data-key="${metric.key}" aria-label="${artLabel}"${tooltipAttributes}>
           ${isPlotVisible ? renderStationPlot(metric) : renderMetricIcon(metric)}
         </button>
+        ${tooltipText && !isPlotVisible ? renderStationTooltip(metric.key, tooltipText) : ""}
         <h3>${label}</h3>
         ${planned ? `<div class="planned">${signed(planned)}</div>` : ""}
         ${controls}
@@ -1156,6 +1317,7 @@
 
   function showCoachView(view) {
     state.view = view === "effects" ? "effects" : "control";
+    state.activeTipKey = "";
     advanceCoach();
   }
 
@@ -1164,6 +1326,7 @@
     if (state.screen === "game" && state.round === 1 && !state.running) {
       state.view = "control";
     }
+    state.activeTipKey = "";
     state.message = remainingActionPoints() === 0
       ? text().messages.allAllocated
       : text().messages.distributeAll;
@@ -1260,6 +1423,7 @@
     if (projectedValue < 0 || projectedValue > metricByKey[key].max) return;
 
     state.allocations = nextAllocations;
+    state.activeTipKey = "";
     state.message = remainingActionPoints() === 0
       ? text().messages.allAllocated
       : text().messages.distributeAll;
@@ -1270,15 +1434,29 @@
     if (state.running) return;
     if (state.coach.active && state.round === 1) {
       state.view = "control";
+      state.activeTipKey = "";
       state.message = text().messages.controlView;
       render();
       return;
     }
 
     state.view = state.view === "control" ? "effects" : "control";
+    state.activeTipKey = "";
     state.message = state.view === "control"
       ? text().messages.controlView
       : text().messages.effectsView;
+    render();
+  }
+
+  function toggleMetricArtwork(key) {
+    if (state.screen === "game" && state.view === "control" && !state.showPlots && state.activeTipKey !== key) {
+      state.activeTipKey = key;
+      render();
+      return;
+    }
+
+    state.activeTipKey = "";
+    state.showPlots = !state.showPlots;
     render();
   }
 
@@ -1293,6 +1471,7 @@
 
     state.view = "effects";
     state.coach.active = false;
+    state.activeTipKey = "";
     state.running = true;
     state.paused = false;
     state.activeStep = null;
@@ -1313,6 +1492,7 @@
       state.running = true;
       state.paused = false;
       state.coach.active = false;
+      state.activeTipKey = "";
       state.activeStep = null;
       state.simulation = buildSimulation();
     }
@@ -1420,6 +1600,7 @@
     state.paused = false;
     state.simulation = null;
     state.allocations = blankAllocations();
+    state.activeTipKey = "";
 
     if (state.values.politik < 0) {
       state.resultReason = "dismissed";
@@ -1437,6 +1618,7 @@
 
     state.round += 1;
     state.view = "control";
+    state.activeTipKey = "";
     state.message = text().messages.yearActionPoints(state.round, state.actionPoints);
     render();
   }
@@ -1506,6 +1688,7 @@
     state.coach.active = false;
     state.coach.step = 0;
     state.showPlots = false;
+    state.activeTipKey = "";
     state.allocations = blankAllocations();
     state.history = [];
     state.initialValues = initialValues(state.scenarioKey);
@@ -1529,6 +1712,7 @@
     state.coach.active = true;
     state.coach.step = 0;
     state.showPlots = false;
+    state.activeTipKey = "";
     state.screen = "game";
     state.view = "control";
     state.message = text().messages.initialActionPoints(state.actionPoints);
@@ -1554,8 +1738,7 @@
     } else if (action === "restart") {
       restart();
     } else if (action === "toggle-plot") {
-      state.showPlots = !state.showPlots;
-      render();
+      toggleMetricArtwork(target.dataset.key);
     } else if (action === "coach-apply") {
       applyCoachSuggestion();
     } else if (action === "coach-next") {
