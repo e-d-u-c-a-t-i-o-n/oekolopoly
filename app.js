@@ -6,6 +6,10 @@
 
   const MAX_ROUNDS = 12;
   const SAVE_ACTION_POINTS_FROM_ROUND = 3;
+  const INTRO_VIDEO_SOURCES = [
+    { src: "assets/oekolopoly-intro-16-9.webm", type: "video/webm" },
+    { src: "assets/oekolopoly-intro-16-9.mp4", type: "video/mp4" }
+  ];
   const DEFAULT_LANGUAGE = "de";
   const languageOptions = {
     de: { code: "DE", label: "Deutsch", htmlLang: "de" },
@@ -462,7 +466,7 @@
 
   const initialLanguageValue = initialLanguage();
   const state = {
-    screen: "intro",
+    screen: "video-intro",
     view: "control",
     language: initialLanguageValue,
     leaderName: "",
@@ -890,6 +894,11 @@
   }
 
   function render() {
+    if (state.screen === "video-intro") {
+      renderVideoIntro();
+      return;
+    }
+
     if (state.screen === "intro") {
       renderIntro();
       return;
@@ -901,6 +910,52 @@
     }
 
     renderGame();
+  }
+
+  function finishVideoIntro() {
+    if (state.screen !== "video-intro") return;
+    const overlay = app.querySelector(".video-intro-screen");
+
+    state.screen = "intro";
+    render();
+
+    if (!overlay) return;
+    overlay.classList.add("is-fading");
+    overlay.setAttribute("aria-hidden", "true");
+    app.appendChild(overlay);
+    window.requestAnimationFrame(() => {
+      overlay.classList.add("is-fade-active");
+    });
+    window.setTimeout(() => {
+      overlay.remove();
+    }, 950);
+  }
+
+  function renderVideoIntro() {
+    app.innerHTML = `
+      <section class="video-intro-screen" aria-label="Oekolopoly Intro">
+        <video class="video-intro-media" data-intro-video autoplay muted playsinline preload="auto">
+          ${INTRO_VIDEO_SOURCES.map((source) => `<source src="${source.src}" type="${source.type}">`).join("")}
+        </video>
+        <h1 class="video-intro-title">Ökolopoly</h1>
+      </section>
+    `;
+
+    const video = app.querySelector("[data-intro-video]");
+    if (!video) {
+      finishVideoIntro();
+      return;
+    }
+
+    video.addEventListener("ended", finishVideoIntro, { once: true });
+    video.addEventListener("error", finishVideoIntro, { once: true });
+
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        video.controls = true;
+      });
+    }
   }
 
   function renderLanguageSelector(placement) {
