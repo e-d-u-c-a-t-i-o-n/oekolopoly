@@ -2068,3 +2068,409 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+/* Dark cosmic theme */
+:root {
+  --paper: #071018;
+  --paper-deep: #03080d;
+  --ink: #eff9ff;
+  --ink-soft: #a8bfcb;
+  --panel: rgba(10, 24, 35, 0.82);
+  --panel-strong: #102232;
+  --line: rgba(169, 229, 255, 0.18);
+  --line-strong: rgba(169, 229, 255, 0.34);
+  --cyan: #63ddff;
+  --cyan-dark: #58d2e6;
+  --blue: #236dff;
+  --red: #ff6b5f;
+  --green: #50d8e9;
+  --orange: #ffc04d;
+  --mint: #47e6a9;
+  --shadow: 0 20px 54px rgba(0, 0, 0, 0.46);
+  --soft-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+}
+
+html,
+body {
+  background: #03080d;
+  color: var(--ink);
+}
+
+button {
+  border-color: var(--line);
+  background: rgba(14, 31, 43, 0.88);
+  color: var(--ink);
+  box-shadow: var(--soft-shadow);
+}
+
+button:hover:not(:disabled) {
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.38);
+}
+
+button:active:not(:disabled) {
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.34);
+}
+
+button:disabled {
+  opacity: 0.42;
+}
+
+.kicker,
+.name-form label,
+.scenario-picker legend,
+.system-name,
+.top-ap-compact span,
+.ap-display h3,
+.intro-attribution a,
+.result-panel-top .kicker {
+  color: var(--cyan);
+}
+
+.intro-screen,
+.game-screen,
+.result-screen,
+.imprint-screen {
+  background:
+    linear-gradient(130deg, rgba(35, 109, 255, 0.16), transparent 42%),
+    linear-gradient(180deg, #02070c 0%, #07131d 48%, #0b1822 100%);
+}
+
+.intro-screen {
+  background: #02070c;
+}
+
+.intro-screen::before {
+  opacity: 0.82;
+  filter: saturate(1.04) contrast(1.04) brightness(0.72);
+}
+
+.imprint-screen::before {
+  opacity: 0.34;
+  filter: saturate(0.74) contrast(1.16) brightness(0.48);
+}
+
+.intro-screen::after {
+  background-image:
+    linear-gradient(90deg, rgba(2, 7, 12, 0.74) 0%, rgba(2, 7, 12, 0.42) 36%, rgba(2, 7, 12, 0.08) 72%, rgba(2, 7, 12, 0.16) 100%),
+    linear-gradient(180deg, rgba(2, 7, 12, 0.08), rgba(2, 7, 12, 0.36));
+  background-size: auto, auto;
+}
+
+.result-screen::after,
+.imprint-screen::after {
+  background-image:
+    linear-gradient(90deg, rgba(2, 7, 12, 0.92) 0%, rgba(3, 12, 18, 0.76) 48%, rgba(4, 14, 22, 0.56) 100%),
+    linear-gradient(180deg, rgba(99, 221, 255, 0.08), rgba(4, 13, 20, 0.78)),
+    linear-gradient(rgba(169, 229, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(169, 229, 255, 0.045) 1px, transparent 1px);
+  background-size: auto, auto, 48px 48px, 48px 48px;
+}
+
+.intro-copy,
+.imprint-content,
+.game-screen {
+  color: var(--ink);
+}
+
+.intro-copy h1 {
+  color: #f6fbff;
+  text-shadow:
+    0 2px 0 #000,
+    0 0 22px rgba(99, 221, 255, 0.22),
+    0 18px 42px rgba(0, 0, 0, 0.44);
+}
+
+.intro-copy p,
+.intro-attribution,
+.imprint-content p,
+.imprint-content address,
+.top-hint,
+.console-message,
+.coach-panel p,
+.result-panel p,
+.scenario-preview span {
+  color: var(--ink-soft);
+}
+
+.intro-teaser span,
+.name-row input,
+.language-switcher,
+.scenario-option span,
+.scenario-preview,
+.scenario-preview div,
+.topline,
+.top-ap-compact,
+.icon-button,
+.coach-panel,
+.coach-suggestion,
+.retro-board,
+.station h3,
+.station-art,
+.station-tooltip,
+.bottom-console,
+.result-diagram-panel,
+.result-grid div,
+.result-plot-card h2,
+.result-plot-frame {
+  border-color: var(--line);
+  background: rgba(10, 24, 35, 0.78);
+  color: var(--ink);
+  box-shadow: var(--soft-shadow);
+  backdrop-filter: blur(18px);
+}
+
+.name-row input::placeholder {
+  color: rgba(224, 240, 248, 0.58);
+}
+
+.name-row input {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.language-switcher span,
+.scenario-preview dt,
+.top-ap-compact span,
+.console-message,
+.coach-secondary,
+.plot-year,
+.effect-value-text {
+  color: var(--ink-soft);
+}
+
+.language-switcher input:checked + span,
+.scenario-option input:checked + span,
+.top-actions .icon-button:not(.quiet),
+.play-button,
+.fast-forward-button,
+.coach-primary,
+.result-diagram-panel > button:last-child,
+.name-row button,
+.intro-screen button,
+.imprint-back {
+  background: linear-gradient(135deg, #236dff, #18c7e4);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(35, 109, 255, 0.28);
+}
+
+.scenario-option input:checked + span {
+  border-color: rgba(99, 221, 255, 0.66);
+  color: #dff9ff;
+  box-shadow: inset 4px 0 0 var(--cyan), 0 0 18px rgba(99, 221, 255, 0.12);
+}
+
+.play-button:disabled,
+.fast-forward-button:disabled,
+.icon-button.quiet,
+.coach-secondary {
+  border: 1px solid var(--line);
+  background: rgba(10, 24, 35, 0.58);
+  color: var(--ink-soft);
+}
+
+.topline,
+.bottom-console {
+  background: rgba(5, 14, 22, 0.86);
+  border-color: var(--line);
+}
+
+.top-ap-compact output,
+.ap-display output {
+  background: rgba(99, 221, 255, 0.12);
+  color: #ff8a7f;
+}
+
+.retro-board {
+  background:
+    linear-gradient(120deg, rgba(3, 9, 14, 0.56), rgba(4, 12, 18, 0.34)),
+    linear-gradient(180deg, rgba(3, 9, 14, 0.04), rgba(3, 9, 14, 0.32)),
+    url("assets/images/start-industrieland.jpg") center bottom / cover no-repeat;
+}
+
+.retro-board::before {
+  background: linear-gradient(90deg, rgba(3, 9, 14, 0.34), transparent 34%, transparent 66%, rgba(3, 9, 14, 0.3));
+}
+
+.retro-board .station-art {
+  background: rgba(7, 18, 27, 0.58);
+  backdrop-filter: blur(10px);
+}
+
+.retro-board .station h3 {
+  background: rgba(7, 18, 27, 0.66);
+  backdrop-filter: blur(10px);
+}
+
+.station-fields .station-art,
+.station-school .station-art,
+.station-factory .station-art,
+.station-park .station-art,
+.station-fields,
+.station-school,
+.station-factory,
+.station-park {
+  color: var(--cyan);
+  --station-accent: var(--cyan);
+}
+
+.station-dump .station-art,
+.station-home .station-art,
+.station-dump,
+.station-home {
+  color: var(--orange);
+  --station-accent: var(--orange);
+}
+
+.station-parliament .station-art,
+.station-city .station-art,
+.station-parliament,
+.station-city {
+  color: #e6f7ff;
+  --station-accent: #e6f7ff;
+}
+
+.station-tooltip {
+  background: rgba(8, 19, 29, 0.96);
+  color: var(--station-accent);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.46);
+}
+
+.station-tooltip::after {
+  border-color: var(--line);
+  background: rgba(8, 19, 29, 0.96);
+}
+
+.station-tooltip-analysis {
+  border-top-color: var(--line);
+  color: #d8f6ff;
+}
+
+.meter,
+.mini-meter,
+.effect-meter-shell {
+  background:
+    linear-gradient(to bottom, transparent 0 19%, rgba(169, 229, 255, 0.18) 19% 20%, transparent 20% 39%, rgba(169, 229, 255, 0.18) 39% 40%, transparent 40% 59%, rgba(169, 229, 255, 0.18) 59% 60%, transparent 60% 79%, rgba(169, 229, 255, 0.18) 79% 80%, transparent 80%),
+    #091824;
+}
+
+.meter-value,
+.planned,
+.coach-progress span {
+  background: rgba(239, 249, 255, 0.9);
+  color: #082232;
+}
+
+.station-art.is-plot-visible,
+.station-plot,
+.plot-panel,
+.result-plot-frame {
+  background: #07131d;
+  fill: #07131d;
+}
+
+.plot-step,
+.plot-value-line {
+  stroke: rgba(169, 229, 255, 0.16);
+}
+
+.plot-step.is-year {
+  stroke: rgba(169, 229, 255, 0.3);
+}
+
+.plot-axis {
+  stroke: rgba(239, 249, 255, 0.5);
+}
+
+.plot-point {
+  stroke: #07131d;
+}
+
+.plot-value-label,
+.effect-label-text {
+  fill: var(--ink);
+}
+
+.effect-diagram .effect-line {
+  stroke: rgba(169, 229, 255, 0.22);
+}
+
+.effect-diagram marker path {
+  fill: rgba(169, 229, 255, 0.62);
+}
+
+.effect-meter-shell {
+  fill: #091824;
+  stroke: var(--line-strong);
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.34));
+}
+
+.effect-meter-tick {
+  stroke: rgba(169, 229, 255, 0.18);
+}
+
+.effect-label-box {
+  fill: rgba(10, 24, 35, 0.94);
+  stroke: var(--line);
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.34));
+}
+
+.allocation-list strong {
+  color: var(--cyan);
+}
+
+.coach-suggestion {
+  border-color: rgba(255, 192, 77, 0.44);
+  background: rgba(255, 192, 77, 0.12);
+  color: #ffe4a6;
+}
+
+.result-summary-panel {
+  background:
+    linear-gradient(90deg, rgba(5, 14, 22, 0.92) 0%, rgba(8, 20, 31, 0.74) 56%, rgba(8, 20, 31, 0.4) 100%),
+    linear-gradient(180deg, rgba(99, 221, 255, 0.08), rgba(4, 13, 20, 0.2)),
+    var(--result-bg) center / cover no-repeat;
+}
+
+.result-screen[data-outcome="fail"] .result-summary-panel {
+  background:
+    linear-gradient(90deg, rgba(5, 14, 22, 0.94) 0%, rgba(35, 16, 16, 0.72) 50%, rgba(35, 16, 16, 0.36) 100%),
+    linear-gradient(180deg, rgba(255, 107, 95, 0.08), rgba(4, 13, 20, 0.16)),
+    var(--result-bg) center / cover no-repeat;
+}
+
+.result-summary-panel,
+.result-diagram-panel {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow);
+}
+
+.result-restart-top,
+.result-panel .result-next-challenge,
+.result-plot-card h2 {
+  background: rgba(99, 221, 255, 0.12);
+  color: var(--cyan);
+}
+
+.result-panel .result-next-challenge {
+  border-color: rgba(99, 221, 255, 0.28);
+}
+
+.result-panel .result-next-challenge:hover:not(:disabled) {
+  background: rgba(99, 221, 255, 0.18);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.34);
+}
+
+.result-grid dd,
+.scenario-preview dd,
+.imprint-content strong,
+.coach-panel h2,
+.effect-label-text {
+  color: var(--ink);
+}
+
+.result-panel[data-result-tone="stable"] h1 {
+  color: var(--cyan);
+}
+
+.result-panel[data-result-tone="shaky"] h1 {
+  color: var(--orange);
+}
