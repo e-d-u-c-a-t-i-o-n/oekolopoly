@@ -11,8 +11,8 @@ Die App ist bewusst ohne Build-System gebaut. `index.html` kann direkt im Browse
 ## Struktur
 
 - `index.html` - Einstiegspunkt
-- `styles.css` - Retro-Screendesign
+- `styles.css` - Screendesign
 - `curves.js` - Wirkungsfunktionen nach den Referenzkurven
 - `app.js` - Spielzustand, Rundenlogik und Rendering
 - `assets/images/` - Spielgrafiken
-- `referenzbilder/` - bereitgestellte Vorlagen und Kurven
+- `referenzbilder/` - bereitgestellte Vorlagen und Kurven, nicht im Code eingebunden
