@@ -4,6 +4,8 @@ Ein kompakter JavaScript-Prototyp fuer ein Oekolopoly-inspiriertes Simulationssp
 
 ## Start
 
+https://oekolopoly.onrender.com/
+
 Die App ist bewusst ohne Build-System gebaut. `index.html` kann direkt im Browser geoeffnet werden.
 
 ## Struktur
